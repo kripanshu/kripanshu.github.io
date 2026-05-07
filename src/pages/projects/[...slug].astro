@@ -1,0 +1,193 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Prompt from '../../components/Prompt.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, summary, started, updated, repo, demo, stack, status } =
+  entry.data;
+---
+
+<BaseLayout
+  title={title}
+  description={summary}
+  path={`~/projects/${entry.id}/`}
+>
+  <Prompt as="h1" command="cat README.md" />
+
+  <h1 class="title">{title}</h1>
+  <p class="summary">{summary}</p>
+
+  <dl class="meta">
+    <div>
+      <dt>status:</dt>
+      <dd class={`status status-${status}`}>{status}</dd>
+    </div>
+    <div>
+      <dt>started:</dt>
+      <dd>{started}</dd>
+    </div>
+    {
+      updated && (
+        <div>
+          <dt>updated:</dt>
+          <dd>{updated}</dd>
+        </div>
+      )
+    }
+    {
+      stack.length > 0 && (
+        <div>
+          <dt>stack:</dt>
+          <dd>{stack.join(', ')}</dd>
+        </div>
+      )
+    }
+    {
+      repo && (
+        <div>
+          <dt>repo:</dt>
+          <dd>
+            <a href={repo} target="_blank" rel="noopener noreferrer">
+              {repo.replace(/^https?:\/\//, '')}
+            </a>
+          </dd>
+        </div>
+      )
+    }
+    {
+      demo && (
+        <div>
+          <dt>demo:</dt>
+          <dd>
+            <a href={demo} target="_blank" rel="noopener noreferrer">
+              {demo.replace(/^https?:\/\//, '')}
+            </a>
+          </dd>
+        </div>
+      )
+    }
+  </dl>
+
+  <hr />
+
+  <article class="prose">
+    <Content />
+  </article>
+
+  <p class="back-link">
+    <a href="/">cd ~/</a>
+  </p>
+</BaseLayout>
+
+<style>
+  .title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+  }
+
+  .summary {
+    color: var(--text-dim);
+    margin: 0 0 var(--space-6);
+  }
+
+  .meta {
+    margin: 0 0 var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--bg-elevated);
+    font-size: var(--text-sm);
+  }
+  .meta div {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-1) 0;
+  }
+  .meta dt {
+    color: var(--text-dim);
+    margin: 0;
+    flex: 0 0 80px;
+  }
+  .meta dd {
+    margin: 0;
+  }
+  .status-active {
+    color: var(--accent);
+  }
+  .status-paused {
+    color: var(--text-dim);
+  }
+  .status-archived {
+    color: var(--text-dim);
+    text-decoration: line-through;
+  }
+
+  /* prose styling for case-study markdown */
+  .prose :global(h2) {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--text);
+    margin: var(--space-8) 0 var(--space-3);
+    /* Style $ command headings as accent */
+  }
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .prose :global(h3) {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin: var(--space-6) 0 var(--space-2);
+  }
+  .prose :global(ul) {
+    padding-left: var(--space-4);
+    margin: 0 0 var(--space-4);
+  }
+  .prose :global(li) {
+    margin-bottom: var(--space-2);
+  }
+  .prose :global(li::marker) {
+    color: var(--accent);
+  }
+  .prose :global(code) {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    font-size: 0.92em;
+  }
+  .prose :global(pre) {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: var(--space-3);
+    overflow-x: auto;
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+  .prose :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--accent);
+    padding-left: var(--space-4);
+    color: var(--text-dim);
+    margin: var(--space-4) 0;
+  }
+
+  .back-link {
+    margin-top: var(--space-12);
+    color: var(--text-dim);
+    font-size: var(--text-sm);
+  }
+</style>
