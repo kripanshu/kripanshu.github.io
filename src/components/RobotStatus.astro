@@ -1,0 +1,64 @@
+---
+const messages = [
+  '[◉_◉] compiling thoughts...',
+  '[•‿•] ok!',
+  '[x_x] kernel panic',
+  '[¬‿¬] just kidding',
+  '[⚆_⚆] training on coffee',
+  '[◔_◔] pondering',
+  '[◕‿◕] hello, human',
+];
+const initial = '[•‿•] hello, human';
+---
+
+<span
+  id="robot-status"
+  class="robot-status"
+  aria-hidden="true"
+  data-messages={JSON.stringify(messages)}>{initial}</span
+>
+
+<script>
+  const el = document.getElementById('robot-status');
+  if (el) {
+    const messages = JSON.parse(el.dataset.messages || '[]') as string[];
+    const reduced = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    if (!reduced && messages.length > 1) {
+      let last = -1;
+      const tick = () => {
+        let next = Math.floor(Math.random() * messages.length);
+        if (next === last) next = (next + 1) % messages.length;
+        last = next;
+        el.style.opacity = '0';
+        setTimeout(() => {
+          el.textContent = messages[next];
+          el.style.opacity = '';
+        }, 200);
+      };
+      setInterval(tick, 3500);
+    }
+  }
+</script>
+
+<style>
+  .robot-status {
+    color: var(--text-dim);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    transition: opacity 200ms ease;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  @media (max-width: 480px) {
+    .robot-status {
+      display: none;
+    }
+  }
+</style>

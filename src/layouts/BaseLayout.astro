@@ -3,6 +3,7 @@ import '../styles/global.css';
 import ThemeScript from '../components/ThemeScript.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import CommandPalette from '../components/CommandPalette.astro';
+import RobotStatus from '../components/RobotStatus.astro';
 
 interface Props {
   title?: string;
@@ -40,6 +41,7 @@ const fullTitle =
 
     <header class="topbar">
       <a href="/" class="path" aria-label="Go home">{path}</a>
+      <RobotStatus />
       <ThemeToggle />
     </header>
 
