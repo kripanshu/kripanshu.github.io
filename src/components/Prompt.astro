@@ -1,0 +1,45 @@
+---
+type Tag = 'h1' | 'h2' | 'h3';
+interface Props {
+  command: string;
+  as?: Tag;
+  id?: string;
+}
+const { command, as: HeadingTag = 'h2' as Tag, id } = Astro.props;
+---
+
+<HeadingTag class="prompt" id={id}>
+  <span class="prompt-symbol" aria-hidden="true">$</span>
+  <span class="prompt-command">{command}</span>
+</HeadingTag>
+
+<style>
+  .prompt {
+    font-size: var(--text-base);
+    font-weight: 500;
+    margin: var(--space-8) 0 var(--space-3);
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+    line-height: 1.4;
+  }
+
+  .prompt:first-child {
+    margin-top: 0;
+  }
+
+  .prompt-symbol {
+    color: var(--accent);
+    user-select: none;
+  }
+
+  .prompt-command {
+    color: var(--text);
+  }
+
+  /* h1 prompts (page titles) get slightly more breathing room */
+  h1.prompt {
+    font-size: var(--text-lg);
+    margin-top: 0;
+  }
+</style>

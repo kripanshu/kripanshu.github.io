@@ -1,0 +1,20 @@
+---
+---
+
+<span class="cursor" aria-hidden="true">_</span>
+
+<style>
+  .cursor {
+    display: inline-block;
+    color: var(--accent);
+    font-weight: 700;
+    animation: blink 1.05s steps(2, end) infinite;
+    margin-left: 2px;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+</style>

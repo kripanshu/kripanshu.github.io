@@ -1,17 +1,26 @@
 ---
-const buildTime = new Date().toISOString();
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prompt from '../components/Prompt.astro';
+import Cursor from '../components/Cursor.astro';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kripanshu Bhargava</title>
-    <meta name="description" content="Software engineer." />
-  </head>
-  <body>
-    <pre>$ scaffold complete — landing page lands in the next commit</pre>
-    <pre>built: {buildTime}</pre>
-  </body>
-</html>
+<BaseLayout
+  title="Kripanshu Bhargava"
+  description="Software engineer."
+  path="~/"
+>
+  <Prompt as="h1" command="whoami" />
+  <p>Kripanshu Bhargava — software engineer.</p>
+
+  <Prompt command="echo 'landing page coming next commit'" />
+  <p class="dim">
+    Theme + base layout shipped. Real content lands in commit #3.
+    <Cursor />
+  </p>
+</BaseLayout>
+
+<style>
+  .dim {
+    color: var(--text-dim);
+  }
+</style>
