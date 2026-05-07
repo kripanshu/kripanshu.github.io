@@ -2,25 +2,120 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Prompt from '../components/Prompt.astro';
 import Cursor from '../components/Cursor.astro';
+import DirListing from '../components/DirListing.astro';
+import type { DirItem } from '../components/DirListing.astro';
+
+// ─────────────────────────────────────────────────────────────
+// CONTENT — refresh me. Anything tagged // TODO is a placeholder
+// inherited from the 2021 site or filled in with best-guess values.
+// ─────────────────────────────────────────────────────────────
+
+// TODO(content): confirm current role + team + focus
+const oneLiner =
+  "Software engineer. Currently SWE II at Microsoft (Cloud + AI) — building services in C#/.NET.";
+
+// TODO(content): expand or rewrite — this is the recruiter-skim paragraph
+const aboutLines = [
+  "I build software for work and for fun. My day job is on Microsoft's Cloud + AI org writing scalable services. Off-hours I poke at personal-finance tooling, embedded hardware, and small games.",
+  "Background: BS + MS in Computer Science (AI minor) at UT Dallas. Research stint at Harvard helped ship tooling now used at Dataverse. Full-stack work at Egen and a deep-learning SaaS at Brain Cradle before joining Microsoft.",
+];
+
+// TODO(content): keep this list to ~4–6. Prefer active or recent.
+const projects: DirItem[] = [
+  {
+    name: 'finsight',
+    description:
+      'local-first personal finance dashboard with on-device LLM categorization', // TODO: link when public
+  },
+  {
+    name: 'jobbot',
+    description: 'parses job-application emails to track your pipeline',
+    href: 'https://github.com/kripanshu/JobBot',
+    external: true,
+  },
+  {
+    name: 'covid-drone-tracker',
+    description: 'computer-vision tracker built during the pandemic',
+    href: 'https://github.com/kripanshu/covid-drone-tracker',
+    external: true,
+  },
+  {
+    name: 'two-ravens',
+    description: 'GUI for quantitative analysis (Harvard internship, 2018)',
+    href: 'http://2ra.vn',
+    external: true,
+  },
+];
+
+const skills = [
+  'TypeScript',
+  'Python',
+  'C#',
+  'C++',
+  '.NET',
+  'React',
+  'Node.js',
+  'Postgres',
+  'AWS',
+  'GCP',
+  'Azure',
+  'Docker',
+  'PyTorch',
+];
+
+// TODO(content): drop or update any that no longer apply
+const contacts: DirItem[] = [
+  {
+    name: 'github',
+    description: 'github.com/kripanshu',
+    href: 'https://github.com/kripanshu',
+    external: true,
+  },
+  {
+    name: 'linkedin',
+    description: 'linkedin.com/in/kripanshubhargava',
+    href: 'https://www.linkedin.com/in/kripanshubhargava',
+    external: true,
+  },
+  {
+    name: 'resume',
+    description: 'PDF — last updated 2021', // TODO: refresh PDF
+    href: '/resume.pdf',
+  },
+];
 ---
 
-<BaseLayout
-  title="Kripanshu Bhargava"
-  description="Software engineer."
-  path="~/"
->
+<BaseLayout path="~/">
   <Prompt as="h1" command="whoami" />
-  <p>Kripanshu Bhargava — software engineer.</p>
+  <p>{oneLiner}</p>
 
-  <Prompt command="echo 'landing page coming next commit'" />
-  <p class="dim">
-    Theme + base layout shipped. Real content lands in commit #3.
-    <Cursor />
+  <Prompt command="cat about.txt" />
+  {aboutLines.map((line) => <p>{line}</p>)}
+
+  <Prompt command="ls ~/projects/ --recent" />
+  <DirListing items={projects} trailingSlash />
+
+  <Prompt command="ls ~/skills/" />
+  <p class="skills">{skills.join('  ·  ')}</p>
+
+  <Prompt command="cat ~/contact" />
+  <DirListing items={contacts} />
+
+  <p class="footer-line">
+    See <a href="/now">~/now</a> for what I'm currently working on.<Cursor />
   </p>
 </BaseLayout>
 
 <style>
-  .dim {
+  .skills {
     color: var(--text-dim);
+    font-size: var(--text-sm);
+    line-height: 1.8;
+  }
+
+  .footer-line {
+    margin-top: var(--space-12);
+    color: var(--text-dim);
+    font-size: var(--text-sm);
   }
 </style>

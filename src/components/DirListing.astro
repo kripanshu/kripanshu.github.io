@@ -1,0 +1,72 @@
+---
+export interface DirItem {
+  name: string;
+  description?: string;
+  href?: string;
+  external?: boolean;
+}
+
+interface Props {
+  items: DirItem[];
+  /** Append "/" after the name to suggest a directory */
+  trailingSlash?: boolean;
+}
+
+const { items, trailingSlash = false } = Astro.props;
+---
+
+<ul class="dir-listing">
+  {
+    items.map((item) => {
+      const display = trailingSlash ? `${item.name}/` : item.name;
+      return (
+        <li>
+          {item.href ? (
+            <a
+              href={item.href}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+            >
+              {display}
+            </a>
+          ) : (
+            <span>{display}</span>
+          )}
+          {item.description && <span class="desc"> ── {item.description}</span>}
+        </li>
+      );
+    })
+  }
+</ul>
+
+<style>
+  .dir-listing {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+
+  .dir-listing li {
+    padding: var(--space-1) 0;
+    line-height: 1.6;
+    /* Hanging indent for wrapped descriptions */
+    padding-left: var(--space-2);
+    text-indent: calc(-1 * var(--space-2));
+  }
+
+  .desc {
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 480px) {
+    .dir-listing li {
+      padding-left: 0;
+      text-indent: 0;
+    }
+    .desc {
+      display: block;
+      padding-left: var(--space-3);
+      font-size: var(--text-sm);
+    }
+  }
+</style>
