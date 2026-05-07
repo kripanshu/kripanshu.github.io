@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Prompt from '../components/Prompt.astro';
+import Cursor from '../components/Cursor.astro';
+
+// TODO(content): refresh me. The point of this page is that it's
+// recently updated — if it gets stale, it loses its meaning.
+const lastUpdated = '2026-05-07';
+
+const focus = [
+  "Shipping FinSight Phase 2: a small fine-tuned local LLM (LoRA on llama3.2:3b) for transaction categorization. Training data comes from the user-corrected categorizations that already accumulated through Phase 1.",
+  "Day job: scalable services on Microsoft's Cloud + AI org. Fewer details here for obvious reasons.",
+  "Tinkering with an Arduino sensor project on the side. Mostly an excuse to break out the soldering iron.",
+];
+
+const reading = [
+  // TODO: replace with actual current reads
+  '“Designing Data-Intensive Applications” — Kleppmann (re-read)',
+  'Various Astro v5 + Cloudflare Workers docs',
+];
+---
+
+<BaseLayout
+  title="Now"
+  description="What I'm working on right now."
+  path="~/now"
+>
+  <Prompt as="h1" command="cat ~/now.md" />
+
+  <p class="meta">
+    <span class="dim">last updated:</span> {lastUpdated}
+  </p>
+
+  <Prompt command="echo $FOCUS" />
+  {focus.map((line) => <p>{line}</p>)}
+
+  <Prompt command="ls ~/reading/" />
+  <ul class="reading-list">
+    {reading.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <p class="note">
+    <span class="dim">
+      Inspired by <a
+        href="https://nownownow.com/about"
+        target="_blank"
+        rel="noopener noreferrer">/now</a
+      > pages everywhere. The idea: a snapshot of current focus, refreshed
+      often enough to stay honest.<Cursor />
+    </span>
+  </p>
+
+  <p class="back-link">
+    <a href="/">cd ~/</a>
+  </p>
+</BaseLayout>
+
+<style>
+  .meta {
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-6);
+  }
+  .dim {
+    color: var(--text-dim);
+  }
+  .reading-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-6);
+  }
+  .reading-list li {
+    padding: var(--space-1) 0;
+  }
+  .reading-list li::before {
+    content: '─ ';
+    color: var(--text-dim);
+  }
+  .note {
+    margin-top: var(--space-12);
+    font-size: var(--text-sm);
+  }
+  .back-link {
+    color: var(--text-dim);
+    font-size: var(--text-sm);
+  }
+</style>
