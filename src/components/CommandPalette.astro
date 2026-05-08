@@ -124,6 +124,15 @@ const projectCommands = projects.map((p) => ({
     render();
   }
 
+  function moveSelection(delta) {
+    if (filtered.length === 0) return;
+    selected = (selected + delta + filtered.length) % filtered.length;
+    render();
+    results
+      .querySelector('li.selected')
+      ?.scrollIntoView({ block: 'nearest' });
+  }
+
   function render() {
     results.innerHTML = '';
     if (filtered.length === 0) {
@@ -245,16 +254,12 @@ const projectCommands = projects.map((p) => ({
 
     if (isArrowDown || isVimDown) {
       e.preventDefault();
-      if (filtered.length === 0) return;
-      selected = (selected + 1) % filtered.length;
-      render();
+      moveSelection(1);
       return;
     }
     if (isArrowUp || isVimUp) {
       e.preventDefault();
-      if (filtered.length === 0) return;
-      selected = (selected - 1 + filtered.length) % filtered.length;
-      render();
+      moveSelection(-1);
       return;
     }
     if (e.key === 'Enter') {
@@ -351,16 +356,33 @@ const projectCommands = projects.map((p) => ({
   }
 
   #cmd-results li {
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-2) var(--space-4) var(--space-2) var(--space-6);
     cursor: pointer;
     display: flex;
-    gap: var(--space-3);
+    gap: var(--space-4);
     align-items: baseline;
     line-height: 1.4;
+    position: relative;
   }
 
   #cmd-results li.selected {
     background: var(--accent-dim);
+  }
+
+  #cmd-results li.selected::before {
+    content: '›';
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  #cmd-results li.selected .cmd-label {
+    color: var(--accent);
   }
 
   #cmd-results li.empty {
