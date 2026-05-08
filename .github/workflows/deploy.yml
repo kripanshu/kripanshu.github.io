@@ -14,6 +14,12 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  # Opt JS actions into Node 24 ahead of the June 2026 default switch.
+  # Required because actions/upload-pages-artifact@v3 and
+  # actions/deploy-pages@v4 still declare Node 20 as their runtime.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   build:
     runs-on: ubuntu-latest
