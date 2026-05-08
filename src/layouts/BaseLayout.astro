@@ -1,0 +1,148 @@
+---
+import '../styles/global.css';
+import ThemeScript from '../components/ThemeScript.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import CommandPalette from '../components/CommandPalette.astro';
+import RobotStatus from '../components/RobotStatus.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+}
+
+const {
+  title = 'Kripanshu Bhargava',
+  description = 'Software engineer.',
+  path = '~/',
+} = Astro.props;
+
+const fullTitle =
+  title === 'Kripanshu Bhargava' ? title : `${title} — Kripanshu Bhargava`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:image:width" content="1408" />
+    <meta property="og:image:height" content="768" />
+    <meta property="og:image:alt" content="Terminal with engineer.go open in vim" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL('/og.png', Astro.site)} />
+    <meta name="theme-color" content="#0b0d10" />
+    <link rel="canonical" href={Astro.url.href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <ThemeScript />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="topbar">
+      <a href="/" class="path" aria-label="Go home">{path}</a>
+      <RobotStatus />
+      <ThemeToggle />
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer>
+      <span class="dim">— end of file —</span>
+      <span class="dim hint">
+        press <kbd>⌘K</kbd> / <kbd>ctrl+K</kbd> for commands
+      </span>
+    </footer>
+
+    <CommandPalette />
+
+    <style>
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        padding: var(--space-2) var(--space-3);
+        background: var(--bg-elevated);
+        border: 1px solid var(--accent);
+        z-index: 100;
+      }
+      .skip-link:focus {
+        left: var(--space-2);
+        top: var(--space-2);
+      }
+
+      .topbar {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-4) var(--space-4);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-4);
+      }
+
+      .path {
+        color: var(--text-dim);
+        border-bottom: none;
+        font-size: var(--text-sm);
+      }
+      .path:hover {
+        color: var(--text);
+      }
+
+      main {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: var(--space-4) var(--space-4) var(--space-16);
+      }
+
+      footer {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: var(--space-8) var(--space-4) var(--space-12);
+        border-top: 1px solid var(--border);
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+      }
+
+      footer .dim {
+        color: var(--text-dim);
+        font-size: var(--text-sm);
+      }
+
+      footer kbd {
+        font-family: inherit;
+        font-size: var(--text-xs);
+        color: var(--text-dim);
+        border: 1px solid var(--border);
+        padding: 1px 5px;
+      }
+
+      @media (max-width: 480px) {
+        .topbar {
+          padding-top: var(--space-4);
+        }
+        footer .hint {
+          display: none;
+        }
+      }
+    </style>
+  </body>
+</html>

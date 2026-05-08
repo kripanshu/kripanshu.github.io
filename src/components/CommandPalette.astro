@@ -1,0 +1,407 @@
+---
+import { getCollection } from 'astro:content';
+
+// Build-time: pull project pages so cmd-k stays in sync with content
+const projects = await getCollection('projects');
+const projectCommands = projects.map((p) => ({
+  id: `project-${p.id}`,
+  label: `cd ~/projects/${p.id}`,
+  desc: p.data.summary,
+  action: { type: 'navigate' as const, target: `/projects/${p.id}` },
+}));
+---
+
+<dialog id="cmd-palette" aria-label="Command palette">
+  <div class="palette" role="dialog" aria-modal="true">
+    <div class="palette-input">
+      <span class="prompt-symbol" aria-hidden="true">$</span>
+      <input
+        id="cmd-input"
+        type="text"
+        placeholder="ls / cd <name> / now / resume / theme dark"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Type a command"
+      />
+      <kbd>esc</kbd>
+    </div>
+    <ul id="cmd-results" role="listbox" aria-label="Available commands"></ul>
+    <div class="palette-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> or <kbd>j</kbd><kbd>k</kbd></span>
+      <span><kbd>↵</kbd> run</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+  </div>
+</dialog>
+
+<script define:vars={{ projectCommands }}>
+  const STATIC_COMMANDS = [
+    {
+      id: 'home',
+      label: 'cd ~/',
+      desc: 'go to home',
+      action: { type: 'navigate', target: '/' },
+    },
+    {
+      id: 'now',
+      label: 'cd ~/now',
+      desc: 'what I am working on this week',
+      action: { type: 'navigate', target: '/now' },
+    },
+    {
+      id: 'about',
+      label: 'cat about.txt',
+      desc: 'about me (scroll on home)',
+      action: { type: 'navigate', target: '/#main' },
+    },
+    {
+      id: 'resume',
+      label: 'cat resume.pdf',
+      desc: 'download resume',
+      action: { type: 'navigate', target: '/resume.pdf' },
+    },
+    {
+      id: 'github',
+      label: 'open github',
+      desc: 'github.com/kripanshu',
+      action: { type: 'external', target: 'https://github.com/kripanshu' },
+    },
+    {
+      id: 'linkedin',
+      label: 'open linkedin',
+      desc: 'linkedin.com/in/kripanshubhargava',
+      action: {
+        type: 'external',
+        target: 'https://www.linkedin.com/in/kripanshubhargava',
+      },
+    },
+    {
+      id: 'theme-dark',
+      label: 'theme dark',
+      desc: 'switch to dark mode',
+      action: { type: 'theme', target: 'dark' },
+    },
+    {
+      id: 'theme-light',
+      label: 'theme light',
+      desc: 'switch to light mode',
+      action: { type: 'theme', target: 'light' },
+    },
+    {
+      id: 'theme-toggle',
+      label: 'theme toggle',
+      desc: 'flip current theme',
+      action: { type: 'theme', target: 'toggle' },
+    },
+  ];
+
+  const COMMANDS = [...STATIC_COMMANDS, ...projectCommands];
+
+  const dialog = document.getElementById('cmd-palette');
+  const input = document.getElementById('cmd-input');
+  const results = document.getElementById('cmd-results');
+
+  let filtered = [...COMMANDS];
+  let selected = 0;
+
+  function fuzzyMatch(query, text) {
+    const q = query.toLowerCase();
+    const t = text.toLowerCase();
+    return t.includes(q);
+  }
+
+  function filterCommands(query) {
+    const q = query.trim();
+    filtered = !q
+      ? [...COMMANDS]
+      : COMMANDS.filter(
+          (c) =>
+            fuzzyMatch(q, c.label) ||
+            fuzzyMatch(q, c.desc) ||
+            fuzzyMatch(q, c.id)
+        );
+    selected = 0;
+    render();
+  }
+
+  function render() {
+    results.innerHTML = '';
+    if (filtered.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'no matches — try `ls`';
+      results.appendChild(li);
+      return;
+    }
+    filtered.forEach((cmd, i) => {
+      const li = document.createElement('li');
+      li.className = i === selected ? 'selected' : '';
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', i === selected ? 'true' : 'false');
+      li.innerHTML = `
+        <span class="cmd-label">${cmd.label}</span>
+        <span class="cmd-desc">${cmd.desc}</span>
+      `;
+      li.addEventListener('click', () => execute(cmd));
+      li.addEventListener('mousemove', () => {
+        selected = i;
+        render();
+      });
+      results.appendChild(li);
+    });
+  }
+
+  function execute(cmd) {
+    const { action } = cmd;
+    if (action.type === 'navigate') {
+      close();
+      window.location.href = action.target;
+    } else if (action.type === 'external') {
+      close();
+      window.open(action.target, '_blank', 'noopener,noreferrer');
+    } else if (action.type === 'theme') {
+      const cur = document.documentElement.dataset.theme;
+      const next =
+        action.target === 'toggle'
+          ? cur === 'dark'
+            ? 'light'
+            : 'dark'
+          : action.target;
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch (_) {
+        /* ignore */
+      }
+      close();
+    }
+  }
+
+  function openPalette() {
+    dialog.showModal();
+    input.value = '';
+    filterCommands('');
+    queueMicrotask(() => input.focus());
+  }
+
+  function close() {
+    if (dialog.open) dialog.close();
+  }
+
+  // Global hotkey: cmd/ctrl + k
+  document.addEventListener('keydown', (e) => {
+    const isModK = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k';
+    if (isModK) {
+      e.preventDefault();
+      if (dialog.open) close();
+      else openPalette();
+    }
+    // `/` opens palette focused (when not already typing somewhere)
+    if (
+      e.key === '/' &&
+      !dialog.open &&
+      document.activeElement?.tagName !== 'INPUT' &&
+      document.activeElement?.tagName !== 'TEXTAREA'
+    ) {
+      e.preventDefault();
+      openPalette();
+    }
+  });
+
+  // Palette key handling
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      // Two-stage close: first esc blurs input (vim-style normal mode),
+      // second esc closes the dialog.
+      if (document.activeElement === input) {
+        e.preventDefault();
+        input.blur();
+      } else {
+        e.preventDefault();
+        close();
+      }
+      return;
+    }
+
+    // `/` from nav-mode refocuses input (vim-style search)
+    if (e.key === '/' && document.activeElement !== input) {
+      e.preventDefault();
+      input.focus();
+      return;
+    }
+
+    // `i` from nav-mode also refocuses (vim-style insert)
+    if (e.key === 'i' && document.activeElement !== input) {
+      e.preventDefault();
+      input.focus();
+      return;
+    }
+
+    const isInputFocused = document.activeElement === input;
+    const isArrowDown = e.key === 'ArrowDown';
+    const isArrowUp = e.key === 'ArrowUp';
+    const isVimDown = !isInputFocused && e.key === 'j';
+    const isVimUp = !isInputFocused && e.key === 'k';
+
+    if (isArrowDown || isVimDown) {
+      e.preventDefault();
+      if (filtered.length === 0) return;
+      selected = (selected + 1) % filtered.length;
+      render();
+      return;
+    }
+    if (isArrowUp || isVimUp) {
+      e.preventDefault();
+      if (filtered.length === 0) return;
+      selected = (selected - 1 + filtered.length) % filtered.length;
+      render();
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filtered[selected]) execute(filtered[selected]);
+      return;
+    }
+  });
+
+  input.addEventListener('input', () => filterCommands(input.value));
+
+  // Backdrop click closes
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+</script>
+
+<style>
+  /* Reset ::backdrop and the dialog itself */
+  #cmd-palette {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    max-width: min(640px, 92vw);
+    width: 640px;
+    margin: 12vh auto auto;
+  }
+
+  #cmd-palette::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  [data-theme='light'] #cmd-palette::backdrop {
+    background: rgba(40, 40, 40, 0.35);
+  }
+
+  .palette {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    font-size: var(--text-sm);
+  }
+
+  [data-theme='light'] .palette {
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
+  }
+
+  .palette-input {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .palette-input .prompt-symbol {
+    color: var(--accent);
+    font-weight: 600;
+    user-select: none;
+  }
+
+  #cmd-input {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: var(--text);
+    font: inherit;
+  }
+
+  #cmd-input::placeholder {
+    color: var(--text-dim);
+  }
+
+  kbd {
+    font-family: inherit;
+    font-size: var(--text-xs);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 0;
+  }
+
+  #cmd-results {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-2) 0;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  #cmd-results li {
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    display: flex;
+    gap: var(--space-3);
+    align-items: baseline;
+    line-height: 1.4;
+  }
+
+  #cmd-results li.selected {
+    background: var(--accent-dim);
+  }
+
+  #cmd-results li.empty {
+    color: var(--text-dim);
+    cursor: default;
+    font-style: italic;
+  }
+
+  .cmd-label {
+    color: var(--text);
+    flex: 0 0 auto;
+    min-width: 180px;
+  }
+
+  .cmd-desc {
+    color: var(--text-dim);
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .palette-footer {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: var(--text-xs);
+  }
+
+  @media (max-width: 480px) {
+    #cmd-palette {
+      margin-top: 8vh;
+    }
+    .cmd-label {
+      min-width: 0;
+    }
+    .palette-footer {
+      flex-wrap: wrap;
+      row-gap: var(--space-1);
+    }
+  }
+</style>

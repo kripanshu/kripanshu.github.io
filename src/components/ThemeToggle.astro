@@ -1,0 +1,50 @@
+---
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Toggle color theme"
+  title="Toggle theme (or run `theme dark|light` in cmd+k)"
+>
+  <span class="t-dark" aria-hidden="true">[ dark ]</span>
+  <span class="t-light" aria-hidden="true">[ light ]</span>
+</button>
+
+<style>
+  #theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: var(--text-sm);
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: color var(--transition), border-color var(--transition);
+  }
+
+  #theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--text-dim);
+  }
+
+  /* show only the label that matches the current theme */
+  :global([data-theme='dark']) .t-light,
+  :global([data-theme='light']) .t-dark {
+    display: none;
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('theme-toggle');
+  btn?.addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch (_) {
+      /* localStorage may be blocked — non-fatal */
+    }
+  });
+</script>
