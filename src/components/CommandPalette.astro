@@ -355,7 +355,11 @@ const projectCommands = projects.map((p) => ({
     overflow-y: auto;
   }
 
-  #cmd-results li {
+  /* These rules target <li>/<span> nodes built at runtime via innerHTML.
+     Astro scopes selectors by adding a data-astro-cid-... attribute to
+     each static element; runtime-created nodes don't inherit it, so we
+     wrap these rules in :global() to keep them effective. */
+  :global(#cmd-results li) {
     padding: var(--space-2) var(--space-4) var(--space-2) var(--space-6);
     cursor: pointer;
     display: flex;
@@ -365,11 +369,11 @@ const projectCommands = projects.map((p) => ({
     position: relative;
   }
 
-  #cmd-results li.selected {
+  :global(#cmd-results li.selected) {
     background: var(--accent-dim);
   }
 
-  #cmd-results li.selected::before {
+  :global(#cmd-results li.selected)::before {
     content: '›';
     position: absolute;
     left: var(--space-3);
@@ -381,23 +385,23 @@ const projectCommands = projects.map((p) => ({
     line-height: 1;
   }
 
-  #cmd-results li.selected .cmd-label {
+  :global(#cmd-results li.selected .cmd-label) {
     color: var(--accent);
   }
 
-  #cmd-results li.empty {
+  :global(#cmd-results li.empty) {
     color: var(--text-dim);
     cursor: default;
     font-style: italic;
   }
 
-  .cmd-label {
+  :global(#cmd-results .cmd-label) {
     color: var(--text);
     flex: 0 0 auto;
     min-width: 180px;
   }
 
-  .cmd-desc {
+  :global(#cmd-results .cmd-desc) {
     color: var(--text-dim);
     flex: 1 1 auto;
     overflow: hidden;
@@ -418,7 +422,7 @@ const projectCommands = projects.map((p) => ({
     #cmd-palette {
       margin-top: 8vh;
     }
-    .cmd-label {
+    :global(#cmd-results .cmd-label) {
       min-width: 0;
     }
     .palette-footer {
