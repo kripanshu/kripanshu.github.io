@@ -12,7 +12,7 @@ stack:
 order: 1
 ---
 
-## $ cat NOTES.md
+## ❯ cat NOTES.md
 
 FinSight is the answer to "I want a clean view of my money without
 shipping every transaction to a cloud SaaS." Bank statements come in,
@@ -31,7 +31,7 @@ The interesting decisions:
   improvable part. Parsing is deterministic. Splitting the two means
   the LLM step is the only thing that changes when prompts improve.
 
-## $ ls features/
+## ❯ ls features/
 
 - CSV / OFX import
 - Account-level views with per-account naming
@@ -39,7 +39,7 @@ The interesting decisions:
 - Manual override that becomes training data
 - Dark, finance-style theme (gold-on-black) with glassmorphism cards
 
-## $ git log --oneline -5
+## ❯ git log --oneline -5
 
 ```text
 bc737e7  Refresh UX with Notion-style left-nav and design.google polish
@@ -49,7 +49,7 @@ bc737e7  Refresh UX with Notion-style left-nav and design.google polish
 3a8c815  Add dark finance theme, UI polish, and integration hardening
 ```
 
-## $ ls roadmap/
+## ❯ ls roadmap/
 
 - Phase 2: fine-tune the local LLM on user-corrected categorizations
 - Mobile-friendly read-only view
