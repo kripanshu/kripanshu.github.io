@@ -1,4 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="4" fill="#0b0d10"/>
-  <text x="16" y="22" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="18" font-weight="700" fill="#82aaff">$</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .bg     { fill: #0b0d10; }
+    .border { stroke: #1f2430; }
+    .accent { stroke: #82aaff; }
+    .fg     { fill: #d8dee9; }
+    @media (prefers-color-scheme: light) {
+      .bg     { fill: #f7f6f2; }
+      .border { stroke: #e2dfd5; }
+      .accent { stroke: #2f5fcf; }
+      .fg     { fill: #1a1a1a; }
+    }
+  </style>
+  <rect class="bg border" x="1" y="1" width="62" height="62" rx="7" stroke-width="2"/>
+  <path class="accent" d="M14 18 L30 32 L14 46"
+        stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text class="fg" x="34" y="48"
+        font-family="ui-monospace, Menlo, monospace" font-size="42" font-weight="700">k</text>
 </svg>

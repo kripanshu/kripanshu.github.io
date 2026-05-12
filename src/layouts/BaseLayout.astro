@@ -4,6 +4,7 @@ import ThemeScript from '../components/ThemeScript.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import CommandPalette from '../components/CommandPalette.astro';
 import RobotStatus from '../components/RobotStatus.astro';
+import BrandMark from '../components/BrandMark.astro';
 
 interface Props {
   title?: string;
@@ -49,7 +50,10 @@ const fullTitle =
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="topbar">
-      <a href="/" class="path" aria-label="Go home">{path}</a>
+      <a href="/" class="brand" aria-label="Go home">
+        <BrandMark size={22} decorative />
+        <span class="path">{path}</span>
+      </a>
       <RobotStatus />
       <ThemeToggle />
     </header>
@@ -92,13 +96,20 @@ const fullTitle =
         gap: var(--space-4);
       }
 
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        border-bottom: none;
+      }
+      .brand:hover .path {
+        color: var(--text);
+      }
+
       .path {
         color: var(--text-dim);
         border-bottom: none;
         font-size: var(--text-sm);
-      }
-      .path:hover {
-        color: var(--text);
       }
 
       main {
