@@ -9,7 +9,7 @@ const { command, as: HeadingTag = 'h2' as Tag, id } = Astro.props;
 ---
 
 <HeadingTag class="prompt" id={id}>
-  <span class="prompt-symbol" aria-hidden="true">$</span>
+  <span class="prompt-symbol" aria-hidden="true">❯</span>
   <span class="prompt-command">{command}</span>
 </HeadingTag>
 
