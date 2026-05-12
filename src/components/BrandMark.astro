@@ -1,0 +1,45 @@
+---
+interface Props {
+  size?: number;
+  label?: string;
+  decorative?: boolean;
+}
+
+const {
+  size = 24,
+  label = 'kripanshu',
+  decorative = false,
+} = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  class="brand-mark"
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : label}
+  aria-hidden={decorative ? true : undefined}
+>
+  <rect
+    x="1" y="1" width="62" height="62" rx="7"
+    fill="var(--bg)"
+    stroke="var(--border)"
+    stroke-width="2"
+  />
+  <path
+    d="M14 18 L30 32 L14 46"
+    stroke="var(--accent)"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+  <text
+    x="34" y="48"
+    font-family="ui-monospace, Menlo, monospace"
+    font-size="42"
+    font-weight="700"
+    fill="currentColor"
+  >k</text>
+</svg>
